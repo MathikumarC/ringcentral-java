@@ -88,6 +88,8 @@ public class Platform {
 
 	final String TOKEN_ENDPOINT_URL = "/restapi/oauth/token";
 
+	final String REDIRECT_URL="https://myapp.example.com/oauth2Callback";
+
 	public Platform(Client client, String appKey, String appSecret,
 			Server server) {
 		super();
@@ -200,7 +202,38 @@ public class Platform {
 		this.response = requestToken(TOKEN_ENDPOINT_URL, body);
 		return response;
 	}
-
+     public String authUrl()
+	{ 
+		
+		HttpUrl authUrl = new HttpUrl.Builder()
+				.scheme("https")
+				.host("platform.devtest.ringcentral.com")
+				.addPathSegment("restapi")
+				.addPathSegment("oauth")
+				.addPathSegment("authorize")
+				.addQueryParameter("response_type", "code")
+				.addQueryParameter("client_id", this.appKey)
+				.addQueryParameter("redirect_uri",REDIRECT_URL)
+				.addQueryParameter("state", "")
+				.addQueryParameter("brand_id", "")
+				.addQueryParameter("display","")
+				.addQueryParameter("prompt","")
+				.build();
+		
+			return authUrl.toString();
+	}
+	public Response authenticateCode(String code)
+			throws IOException{
+		
+		HashMap<String, String> body = new HashMap<String, String>();
+		body.put("code", code);
+		body.put("redirect_uri", REDIRECT_URL);
+		body.put("grant_type", "authorization_code");
+		this.response = requestToken(TOKEN_ENDPOINT_URL, body);
+		System.out.println(this.response);
+		return response;
+		
+	}
 	public Response logout() throws IOException {
 		HashMap<String, String> body = new HashMap<String, String>();
 		body.put("access_token", this.auth.access_token);
